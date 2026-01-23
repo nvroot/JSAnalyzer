@@ -103,6 +103,7 @@ SECRET_PATTERNS = [
     (re.compile(r'lin_api_[a-zA-Z0-9]{40}'), "Linear API Key"),
     (re.compile(r'[hH]eroku['\"][0-9a-f]{32}['\"]'), "Heroku API Key"),
     (re.compile(r'dop_v1_[a-z0-9]{64}'), "DigitalOcean Token"),
+    (re.compile(r'SG\.[\w\d\-_]{22}\.[\w\d\-_]{43}'), "SendGrid API Key"),
     
 ]
 
