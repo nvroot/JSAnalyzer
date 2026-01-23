@@ -102,12 +102,18 @@ SECRET_PATTERNS = [
     (re.compile(r'(?i)(?:facebook|fb).{0,32}(?:api|app|application|client|consumer|secret|key).{0,32}([a-z0-9]{32})\b'), "Facebook Secret Key"),
     (re.compile(r'(EAACEdEose0cBA[A-Z0-9]{20,})\b'), "Facebook Access Token"),
     (re.compile(r'\b(ya29\.[a-z0-9_-]{30,})\b'), "Google OAuth2 Access Token"),
+    # New
     (re.compile(r'\d{9}:[a-zA-Z0-9_-]{35}'), "Telegram Bot Token"),
     (re.compile(r'lin_api_[a-zA-Z0-9]{40}'), "Linear API Key"),
     (re.compile(r"[hH]eroku['\"][0-9a-f]{32}['\"]"), "Heroku API Key"),
     (re.compile(r'dop_v1_[a-z0-9]{64}'), "DigitalOcean Token"),
-    (re.compile(r'SG\.[\w\d\-_]{22}\.[\w\d\-_]{43}'), "SendGrid API Key"),
     (re.compile(r'SK[0-9a-fA-F]{32}'), "Twilio API Key"),
+    (re.compile(r'SG\.[\w\d\-_]{22}\.[\w\d\-_]{43}'), "SendGrid API Key"),
+    (re.compile(r'sl.[A-Za-z0-9_-]{20,100}'), "Dropbox Access Token"),
+    (re.compile(r'glpat-[0-9a-zA-Z-_]{20}'), "GitLab Token"),
+    
+    
+    
     
     
 ]
