@@ -286,48 +286,78 @@ class BurpExtender(IBurpExtender, IContextMenuFactory, ITab):
         new_findings = []
         
         # 1. Extract endpoints
-        for pattern in ENDPOINT_PATTERNS:
-            for match in pattern.finditer(body):
-                value = match.group(1).strip()
-                if self._is_valid_endpoint(value):
-                    finding = self._add_finding("endpoints", value, source_name)
-                    if finding:
-                        new_findings.append(finding)
+        try:
+            for pattern in ENDPOINT_PATTERNS:
+                for match in pattern.finditer(body):
+                    try:
+                        value = match.group(1).strip()
+                        if self._is_valid_endpoint(value):
+                            finding = self._add_finding("endpoints", value, source_name)
+                            if finding:
+                                new_findings.append(finding)
+                    except (IndexError, Exception) as e:
+                        continue
+        except Exception as e:
+            self._log("Error in endpoint extraction: " + str(e))
         
         # 2. URLs
-        for pattern in URL_PATTERNS:
-            for match in pattern.finditer(body):
-                value = match.group(1).strip() if match.lastindex else match.group(0).strip()
-                if self._is_valid_url(value):
-                    finding = self._add_finding("urls", value, source_name)
-                    if finding:
-                        new_findings.append(finding)
+        try:
+            for pattern in URL_PATTERNS:
+                for match in pattern.finditer(body):
+                    try:
+                        value = match.group(1).strip() if match.lastindex else match.group(0).strip()
+                        if self._is_valid_url(value):
+                            finding = self._add_finding("urls", value, source_name)
+                            if finding:
+                                new_findings.append(finding)
+                    except (IndexError, Exception) as e:
+                        continue
+        except Exception as e:
+            self._log("Error in URL extraction: " + str(e))
         
         # 3. Secrets
-        for pattern, _ in SECRET_PATTERNS:
-            for match in pattern.finditer(body):
-                value = match.group(1).strip()
-                if self._is_valid_secret(value):
-                    masked = value[:10] + "..." + value[-4:] if len(value) > 20 else value
-                    finding = self._add_finding("secrets", masked, source_name)
-                    if finding:
-                        new_findings.append(finding)
+        try:
+            for pattern, _ in SECRET_PATTERNS:
+                for match in pattern.finditer(body):
+                    try:
+                        value = match.group(1).strip()
+                        if self._is_valid_secret(value):
+                            masked = value[:10] + "..." + value[-4:] if len(value) > 20 else value
+                            finding = self._add_finding("secrets", masked, source_name)
+                            if finding:
+                                new_findings.append(finding)
+                    except (IndexError, Exception) as e:
+                        continue
+        except Exception as e:
+            self._log("Error in secret extraction: " + str(e))
         
         # 4. Emails
-        for match in EMAIL_PATTERN.finditer(body):
-            value = match.group(1).strip()
-            if self._is_valid_email(value):
-                finding = self._add_finding("emails", value, source_name)
-                if finding:
-                    new_findings.append(finding)
+        try:
+            for match in EMAIL_PATTERN.finditer(body):
+                try:
+                    value = match.group(1).strip()
+                    if self._is_valid_email(value):
+                        finding = self._add_finding("emails", value, source_name)
+                        if finding:
+                            new_findings.append(finding)
+                except (IndexError, Exception) as e:
+                    continue
+        except Exception as e:
+            self._log("Error in email extraction: " + str(e))
         
         # 5. Files (sensitive file references)
-        for match in FILE_PATTERNS.finditer(body):
-            value = match.group(1).strip()
-            if self._is_valid_file(value):
-                finding = self._add_finding("files", value, source_name)
-                if finding:
-                    new_findings.append(finding)
+        try:
+            for match in FILE_PATTERNS.finditer(body):
+                try:
+                    value = match.group(1).strip()
+                    if self._is_valid_file(value):
+                        finding = self._add_finding("files", value, source_name)
+                        if finding:
+                            new_findings.append(finding)
+                except (IndexError, Exception) as e:
+                    continue
+        except Exception as e:
+            self._log("Error in file extraction: " + str(e))
         
         # Update UI
         if new_findings:
@@ -468,6 +498,13 @@ class AnalyzeAction(ActionListener):
         self.invocation = invocation
     
     def actionPerformed(self, event):
-        messages = self.invocation.getSelectedMessages()
-        for msg in messages:
-            self.extender.analyze_response(msg)
+        try:
+            messages = self.invocation.getSelectedMessages()
+            for msg in messages:
+                try:
+                    self.extender.analyze_response(msg)
+                except Exception as e:
+                    self.extender._log("Error analyzing response: " + str(e))
+        except Exception as e:
+            if self.extender:
+                self.extender._log("Action error: " + str(e))
